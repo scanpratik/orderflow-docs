@@ -131,7 +131,7 @@ Customer → API Gateway → Lambda (order-service)
 ### Week 2–4 — Spring Boot Reboot 🟡 In Progress
 - [x] Write SDD Spec → [`sdd_spec_order_service.md`](./sdd_spec_order_service.md) ✅ Approved
 - [ ] **Scaffold** `order-service` (Spring Boot 3.x + Spring Cloud Function + Gradle Kotlin DSL)
-- [ ] Add JPA + PostgreSQL + validation + JWT security + exception handling
+- [ ] Add DynamoDB Enhanced Client + validation + JWT security + exception handling
 - [ ] Write tests (JUnit 5 / Mockito / Testcontainers)
 - [ ] Deploy to AWS Lambda via CDK (`cdk deploy`)
 

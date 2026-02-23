@@ -9,7 +9,7 @@
 ## 1. What Are We Building?
 
 A **production-grade REST API** for managing orders, deployed as an **AWS Lambda function** behind API Gateway.  
-It demonstrates: clean layered architecture, JPA persistence, input validation, JWT auth, global error handling, and OpenAPI docs — all running serverless on Lambda.
+It demonstrates: clean layered architecture, DynamoDB persistence, input validation, JWT auth, global error handling, and OpenAPI docs — all running serverless on Lambda.
 
 ---
 
