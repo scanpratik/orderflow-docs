@@ -33,7 +33,7 @@
 ### Week 2–4: Spring Boot Reboot (SDD Loop Begins!)
 - [ ] Write SDD spec with Antigravity (API, data model, acceptance criteria)
 - [ ] Scaffold Spring Boot 3.x REST API using **Spring Cloud Function** (Lambda-compatible)
-- [ ] Add JPA + RDS Postgres (via Lambda VPC), validation, JWT security, exception handling
+- [ ] Add DynamoDB Enhanced Client (SDK v2) + validation + JWT security + exception handling
 - [ ] Write tests (JUnit 5, Mockito, Testcontainers)
 - [ ] Deploy to **AWS Lambda** via API Gateway (CDK)
 
@@ -59,6 +59,7 @@
 | Cloud | AWS (**Lambda**, API Gateway, EventBridge, SQS, SNS, Step Functions, Bedrock) |
 | IaC | AWS CDK (Java) |
 | Methodology | SDD — spec first, then code |
+| Database | **DynamoDB** (AWS managed, serverless) |
 | Portfolio project | **OrderFlow** — multi-service event-driven e-commerce system |
 
 ---

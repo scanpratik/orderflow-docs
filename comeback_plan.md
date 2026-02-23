@@ -86,9 +86,9 @@ Before any code, answer these with me:
 #### Week 2–4: Spring Boot Reboot
 - [ ] **Write SDD spec with me** — define API, data model, acceptance criteria
 - [ ] I scaffold a full **Spring Boot 3.x REST API** using **Spring Cloud Function** (Lambda-compatible)
-- [ ] Add: JPA + RDS Postgres (via Lambda VPC), validation, JWT security, global exception handling
+- [ ] Add: **DynamoDB Enhanced Client** (SDK v2), validation, JWT security, global exception handling
 - [ ] Write tests (JUnit 5, Mockito, Testcontainers) — derived directly from spec
-- [ ] Deploy to **AWS Lambda** via API Gateway (I'll write the CDK too — Lambda + API GW + RDS)
+- [ ] Deploy to **AWS Lambda** via API Gateway (I'll write the CDK too — Lambda + API GW + DynamoDB)
 - [ ] OpenAPI/Swagger doc = your living spec
 
 ---
@@ -110,7 +110,7 @@ Before any code, answer these with me:
 [Inventory  [Notif.   [Order Fulfillment
  Lambda]     Lambda]   Workflow]
      ↓
-[DynamoDB / RDS Aurora]
+[DynamoDB]
 ```
 
 #### 📋 SDD in Phase 2 — Event Catalog Per Service
@@ -243,7 +243,7 @@ Treat every AI feature like a product spec:
 | Framework | Spring Boot **3.4.x** + **Spring Cloud Function** | Free |
 | Build | **Gradle** | Free |
 | EDA | SQS · SNS · EventBridge · Step Functions | Pay-per-use |
-| Cloud | **Lambda** · API GW · RDS Aurora · DynamoDB · Bedrock | Pay-per-use |
+| Cloud | **Lambda** · API GW · **DynamoDB** · Bedrock | Pay-per-use |
 | IaC | AWS CDK (Java) | Free |
 | Testing | JUnit 5 · Mockito · Testcontainers | Free |
 | Methodology | **SDD (Spec-Driven Development)** | Free |
