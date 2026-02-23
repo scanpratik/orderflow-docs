@@ -20,8 +20,8 @@ It demonstrates: clean layered architecture, JPA persistence, input validation, 
 | Language | Java 21 (virtual threads enabled) |
 | Framework | Spring Boot 3.4.x + **Spring Cloud Function** |
 | Build | Gradle (Kotlin DSL) |
-| Database | PostgreSQL — RDS Aurora Serverless v2 (via Lambda VPC) |
-| ORM | Spring Data JPA + Hibernate |
+| Database | **DynamoDB** (AWS managed, serverless, no VPC needed) |
+| ORM | AWS DynamoDB Enhanced Client (SDK v2) |
 | Auth | Spring Security + JWT (stateless) |
 | Docs | SpringDoc OpenAPI (Swagger UI) |
 | Testing | JUnit 5 + Mockito + Testcontainers |
@@ -86,24 +86,30 @@ It demonstrates: clean layered architecture, JPA persistence, input validation, 
 
 ## 4. Data Model
 
-### `orders` table
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | UUID (PK) | Auto-generated |
-| `customer_id` | VARCHAR(100) | Required |
-| `status` | ENUM | PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED |
-| `total_amount` | DECIMAL(10,2) | Computed from items |
-| `created_at` | TIMESTAMP | Auto |
-| `updated_at` | TIMESTAMP | Auto |
+### DynamoDB Table: `orders`
 
-### `order_items` table
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | UUID (PK) | Auto-generated |
-| `order_id` | UUID (FK) | References `orders.id` |
-| `product_id` | VARCHAR(100) | Required |
-| `quantity` | INT | Min: 1 |
-| `unit_price` | DECIMAL(10,2) | Min: 0.01 |
+| Attribute | Type | Notes |
+|-----------|------|-------|
+| `id` (PK) | String (UUID) | Partition key, auto-generated |
+| `customerId` | String | Required |
+| `status` | String (ENUM) | `PENDING` \| `CONFIRMED` \| `SHIPPED` \| `DELIVERED` \| `CANCELLED` |
+| `totalAmount` | Number (Decimal) | Computed from items |
+| `items` | List\<Map\> | Embedded — see below |
+| `createdAt` | String (ISO-8601) | Auto-set on write |
+| `updatedAt` | String (ISO-8601) | Auto-updated on write |
+
+### Embedded `items` List (within each order document)
+
+| Attribute | Type | Notes |
+|-----------|------|-------|
+| `itemId` | String (UUID) | Auto-generated |
+| `productId` | String | Required |
+| `quantity` | Number | Min: 1 |
+| `unitPrice` | Number | Min: 0.01 |
+
+> **Design note**: Items are embedded in the order document (DynamoDB document model). No separate `order_items` table — this avoids multi-table transactions and aligns with DynamoDB best practices for 1:few relationships.
+>
+> **GSI**: `customerId-index` (GSI on `customerId`) for querying all orders by customer.
 
 ---
 
@@ -150,11 +156,12 @@ order-service/
 │   ├── controller/     OrderControllerTest.java (MockMvc)
 │   ├── service/        OrderServiceTest.java (Mockito)
 │   └── integration/    OrderIntegrationTest.java (Testcontainers)
-├── cdk/                AWS CDK stack (Lambda + API GW + RDS)
+├── cdk/                AWS CDK stack (Lambda + API GW + DynamoDB)
 └── build.gradle.kts
 ```
 
-> **Lambda packaging**: Spring Cloud Function adapter wraps the Spring Boot app as a Lambda handler. Deployed via `./gradlew buildZip` + CDK.
+> **Lambda packaging**: Spring Cloud Function adapter wraps the Spring Boot app as a Lambda handler. Deployed via `./gradlew buildZip` + CDK.  
+> **DynamoDB**: Provisioned via CDK (`TableV2` with PAY_PER_REQUEST billing). Lambda IAM role gets `dynamodb:PutItem`, `dynamodb:GetItem`, `dynamodb:Query`, `dynamodb:UpdateItem` on the table.
 
 ---
 
@@ -170,9 +177,18 @@ order-service/
 
 # View coverage report
 open build/reports/jacoco/test/html/index.html
+```
 
-# Build Lambda ZIP
+### Deployment to AWS Lambda
+```bash
+# Build deployable ZIP
 ./gradlew buildZip
+
+# Deploy via CDK (creates Lambda + API GW + DynamoDB table)
+cdk deploy
+
+# API Gateway URL will be printed — test live endpoint
+curl https://<api-id>.execute-api.<region>.amazonaws.com/prod/api/v1/orders
 ```
 
 ### Manual Verification
